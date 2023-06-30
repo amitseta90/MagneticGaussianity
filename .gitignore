@@ -3,3 +3,5 @@ Plot/*
 
 .vscode
 env_*
+
+**/__pycache__/
