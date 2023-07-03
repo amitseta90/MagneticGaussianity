@@ -42,8 +42,8 @@ def load_magnetic_field(path, gaussian, direction, return_polang):
     return (bpar, b_perp, polang)
 
 
-def build_random_electron_density(shape, offset_mean, offset_std, fluctuations, loglogavgslope, flexibility=None, asperity=None):
+def build_random_electron_density(shape, offset_mean, offset_std, fluctuations, loglogavgslope,  flexibility=None, asperity=None):
     domain = ift.makeDomain(ift.RGSpace(shape))
-    f = ift.SimpleCorrelatedField(domain, offset_mean, offset_std, fluctuations, loglogavgslope, flexibility, asperity)    
+    f = ift.SimpleCorrelatedField(domain, offset_mean=offset_mean, offset_std=offset_std, fluctuations=fluctuations, flexibility=flexibility, asperity=asperity, loglogavgslope=loglogavgslope)    
     return f(ift.from_random(f.domain)).val_rw()
 
