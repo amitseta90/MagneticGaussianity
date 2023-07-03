@@ -1,5 +1,4 @@
 import numpy as np 
-import scipy.special as sp
 
 
 def calculate_observables(B_par, B_perp,  pol_angle, n_th, n_cr, do_rm=False, do_syncI = False, do_syncQU= False, faraday_rotate=False, spectral_index = 3., lambda_square=1., direction=0, rm_prev=None):
@@ -38,11 +37,17 @@ def calculate_observables(B_par, B_perp,  pol_angle, n_th, n_cr, do_rm=False, do
     lsd = None
     
     if do_rm or faraday_rotate: 
-        fs = faraday_source(B_par, n_th)
-        if do_rm:
-            results[0] = np.sum(fs, axis=direction)
+        fs = B_par*n_th
         if faraday_rotate: 
-            lsd = lambda_square*faraday_depth(fs, direction, rm_prev)  
+            lsd = faraday_depth(fs, direction, rm_prev)  
+            if do_rm: 
+                slc = [slice(None), slice(None), slice(None)]
+                slc[direction] = -1
+                results[0] = lsd[tuple(slc)]
+            lsd *= lambda_square
+        else:
+            if do_rm:
+                results[0] = np.sum(fs, axis=direction)
 
     if do_syncI or do_syncQU:
         si, sq, su = synchrotron_emissivities(B_perp, n_cr, pol_angle, spectral_index, lsd) 
@@ -70,10 +75,6 @@ def synchrotron_emissivities(B_perp, n_cr, pol_angle=False, spectral_index=3., l
         s_u = None    
     return (s_i, s_q, s_u)
 
-
-def faraday_source(B_par, n_th):
-    return B_par*n_th
-    
 
 def faraday_depth(fs, direction, prev_rm):
     dr = 1.
