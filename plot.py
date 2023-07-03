@@ -1,19 +1,12 @@
 import matplotlib.pyplot as pl
 from matplotlib import cm
-import cmasher as cma
-import numpy as np
-
 
 
 def get_cmap(cm_string):
     if cm_string == '':
         return None
-    try:
-        cmap = getattr(cm, cm_string)
-        return cmap
-    except AttributeError:
-        cmap = getattr(cma, cm_string)
-        return cmap
+    cmap = getattr(cm, cm_string)
+    return cmap
 
 
 def plot_obs(rm, i, q, u, path='./Plot/'):
@@ -24,7 +17,7 @@ def plot_obs(rm, i, q, u, path='./Plot/'):
     if do_field[2] + do_field[3] == 1:
         raise ValueError('Thats odd, either both q and u should be given or None of them')
     
-    cmaps = ['prinsenvlag_r', 'viridis', 'magma', 'magma']
+    cmaps = ['RdBu_r', 'viridis', 'magma', 'magma']
     names = ['RM', 'I', 'Q', 'U']
 
     n_plots = sum(do_field)
@@ -38,8 +31,8 @@ def plot_obs(rm, i, q, u, path='./Plot/'):
         map(fields.__delitem__, sorted(do_field, reverse=True))
         ax.imshow(fields[0], 
                   cmap=get_cmap(cmaps[0]), 
-                  title=names[0]
                   )
+        ax.set_title(names[0])
         mappable = ax.get_images()[0]
         fig.colorbar(mappable, ax=ax)
         
@@ -49,18 +42,15 @@ def plot_obs(rm, i, q, u, path='./Plot/'):
     elif n_plots == 2:
     
         fig, ax  = pl.subplots(ncols=2, nrows=1) 
-        ax[0].imshow(fields[0], 
-                  cmap=get_cmap(cmaps[0])
-                  )
-        mappable = ax[0].get_images()[0]
-        fig.colorbar(mappable, ax=ax[0])
         
-        ax[1].imshow(fields[1], 
-                  cmap=get_cmap(cmaps[1])
-                  )
-        mappable = ax[1].get_images()[0]
-        fig.colorbar(mappable, ax=ax[1])
-        pl.tight_layout()
+        for i in range(n_plots):
+        
+            ax[i].imshow(fields[i], 
+                  cmap=get_cmap(cmaps[i]), 
+                )
+            ax[i].set_title(names[i])
+            mappable = ax[i].get_images()[0]
+            fig.colorbar(mappable, ax=ax[i])
         fig.savefig(path + names[0] + '_' + names[1], dpi=200)
         
     else: 
@@ -73,8 +63,9 @@ def plot_obs(rm, i, q, u, path='./Plot/'):
             
             j, k = pos[i] 
             (ax[j][k]).imshow(fields[i], 
-                    cmap=get_cmap(cmaps[i])
+                    cmap=get_cmap(cmaps[i]), 
                     )
+            (ax[j][k]).set_title(names[i])
             mappable = ax[j, k].get_images()[0]
             fig.colorbar(mappable, ax=ax[j, k])
         fig.savefig(path + 'all_obs', dpi=200)

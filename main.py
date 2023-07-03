@@ -7,13 +7,17 @@ import param as p
 
 def main():
     
-    file_names = magnetic_file_names(p.low_mach)
+    if p.single_file is None:
+        file_names = magnetic_file_names(p.low_mach, p.data_path)
+    else: 
+        file_names = [p.data_path + p.single_file]
     
     
     obs = [None, None, None, None]
     calc_obs = [p.do_rm, p.do_i, p.do_qu, p.do_qu]
     
     for i, fn in enumerate(file_names):
+        print("Calculating observables for file {}".format(fn))
         Bpar, Bperp, polang = load_magnetic_field(fn, p.gaussian, p.direction, p.do_qu + p.faraday_rotate)
         
         shp = list(Bpar.shape)
@@ -48,7 +52,7 @@ def main():
             if calc_obs[j]:
                 obs[j] += _obs[j]
     
-    plot_obs(*obs)
+    plot_obs(*obs, p.plot_path)
         
 if __name__ == "__main__":
     main()
