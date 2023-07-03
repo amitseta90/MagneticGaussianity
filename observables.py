@@ -60,7 +60,7 @@ def synchrotron_emissivities(B_perp, n_cr, pol_angle=False, spectral_index=3., l
     s_i = B_perp**((spectral_index + 1)/2)*n_cr
 
     if pol_angle is not None:
-        rel_factor = (sp.gamma(spectral_index/4 + 7./12)*4)/(sp.gamma(spectral_index/4 + 19./12)*(spectral_index - 1)) # type: ignore
+        rel_factor = (spectral_index + 1)/(spectral_index + 7./3) # type: ignore
         if lambda_square_fd is not None:
             pol_angle += lambda_square_fd
         s_q = s_i*rel_factor*np.cos(2*pol_angle) 
