@@ -4,4 +4,6 @@ Plot/*
 .vscode
 env_*
 
+*npy
+
 **/__pycache__/
