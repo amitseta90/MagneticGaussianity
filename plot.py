@@ -1,6 +1,8 @@
+import os
 import matplotlib.pyplot as pl
 from matplotlib import cm
 import numpy as np
+from analysis import calc_power_spectra
 
 def get_cmap(cm_string):
     if cm_string == '':
@@ -8,8 +10,46 @@ def get_cmap(cm_string):
     cmap = getattr(cm, cm_string)
     return cmap
 
+    
+    
+def gen_axis(n_plots, names, n_figs):
+    figs = []
+    axs = []
+    if n_plots == 1:    
+        for _ in range(n_figs):
+            fig, ax  = pl.subplots(ncols=1, nrows=1)
+            ax = np.asarray([ax,]).reshape((1, 1))
+            figs.append(fig)
+            axs.append(ax)
+        coordinates = [(0 , 0), ]
+        pl_name = names[0] + '_'
+    elif n_plots == 2:
+        for _ in range(n_figs):
+            fig, ax  = pl.subplots(ncols=2, nrows=1)
+            ax = np.asarray([ax,])
+            figs.append(fig)
+            axs.append(ax)
+        coordinates = [(0 , 0), (0, 1)]
+        pl_name = names[0] + names[1] + '_'
+    else:
+        for _ in range(n_figs):
+            fig, ax  = pl.subplots(ncols=2, nrows=2)
+            figs.append(fig)
+            axs.append(ax)
+        coordinates = [(0, 0), (0, 1), (1, 0), (1, 1), ]
+        pl_name = 'all_obs_'
+    return figs, axs, coordinates, pl_name
+    
 
-def plot_obs(rm, i, q, u, path='./Plot/', name='', save_pdfs=True):
+
+def plot_obs(rm, i, q, u, stat_dict, n_boxes, path='./Plot/', name='', save_pdfs=True):
+    
+    pl.rcParams["axes.prop_cycle"] = pl.cycler("color", pl.cm.plasma(np.linspace(0, 1, n_boxes)))
+    
+    if len(name) > 0: 
+        path  = path + name + '/'
+        if not os.path.exists(path):
+            os.makedirs(path)
     
     fields = [rm, i, q, u]
     do_field = [not f is None for f in fields]
@@ -26,93 +66,71 @@ def plot_obs(rm, i, q, u, path='./Plot/', name='', save_pdfs=True):
     map(names.__delitem__, sorted(do_field, reverse=True))
     map(cmaps.__delitem__, sorted(do_field, reverse=True))
     
-    if n_plots == 1:
-        fig, ax  = pl.subplots(ncols=1, nrows=1)
-        ax.imshow(fields[0], 
-                  cmap=get_cmap(cmaps[0]), 
-                  )
-        ax.set_title(names[0])
-        mappable = ax.get_images()[0]
-        fig.colorbar(mappable, ax=ax)
-        
-        pl_name = name + '_' + names[0]
-        
-        fig.savefig(path + pl_name + '_2d', dpi=200)
-        
-        pl.close('all')
-        
-        
-        fig, ax  = pl.subplots(ncols=1, nrows=1)
-        pdf, bins, _ = ax.hist(fields[0], bins=1000, density=True, histtype='step')
-        ax.set_xlabel(names[0])
-        ax.set_yscale('log')
-        fig.savefig(path +  pl_name + '_hist', dpi=200)
-        
-        if save_pdfs:
-            np.save(path + pl_name + '_ pdf.npy', pdf)
-            np.save(path + pl_name + '_bins.npy', bins)
-        pl.close('all')
-        
-    elif n_plots == 2:
     
-        fig_im, ax_im  = pl.subplots(ncols=2, nrows=1) 
-        fig_hist, ax_hist  = pl.subplots(ncols=2, nrows=1) 
         
-        pl_name = names[0] + '_' + names[1] + '_' + name
+    figs, axs, pos, pl_name = gen_axis(n_plots, names, 6)
+    
+    fig_im, fig_hist, fig_mom, fig_pdf, fig_ps, fig_ps_fit = figs
+    ax_im , ax_hist, ax_mom, ax_pdf, ax_ps, ax_ps_fit  = axs
+    
+    pl_name +=  name
+    
+    for i in range(n_plots):
+    
+        j, k = pos[i] 
+        ax_im[j, k].imshow(fields[i], 
+                cmap=get_cmap(cmaps[i]), 
+            )
+        ax_im[j, k].set_title(names[i])
+        mappable = ax_im[j, k].get_images()[0]
+        fig_im.colorbar(mappable, ax=ax_im[j, k])
         
-        for i in range(n_plots):
-        
-            ax_im[i].imshow(fields[i], 
-                  cmap=get_cmap(cmaps[i]), 
-                )
-            ax_im[i].set_title(names[i])
-            mappable = ax_im[i].get_images()[0]
-            fig_im.colorbar(mappable, ax=ax_im[i])
+        pdf, bins, _ = ax_hist[j, k].hist(fields[i].flatten(), bins=1000, density=True, histtype='step')
+        ax_hist[j, k].set_xlabel(names[i])
+        ax_hist[j, k].set_yscale('log')
+        if save_pdfs:
+            np.save(path + names[i] + '_' + name + '_pdf.npy', pdf)
+            np.save(path + names[i] + '_' + name + '_bins.npy', bins)
             
-            pdf, bins, _ = ax_hist[i].hist(fields[i], bins=1000, density=True, histtype='step')
-            ax_hist[i].set_xlabel(names[i])
-            ax_hist[i].set_yscale('log')
-            if save_pdfs:
-                np.save(path + names[i] + '_' + name + '_ pdf.npy', pdf)
-                np.save(path + names[i] + '_' + name + '__bins.npy', bins)
-                
-        fig_im.savefig(path + pl_name + '_2d', dpi=200)
+        moments = stat_dict['Moments'][names[i]]
+        moments_colors = ['blue', 'red', 'green']
+        for jj, (n_mom, mom_arr) in enumerate(moments.items()):
+            ax_mom[j, k].plot(mom_arr, label=n_mom, c=moments_colors[jj])
+        ax_mom[j, k].set_xlabel(names[i])  
+        ax_mom[j, k].set_yscale('log')
+        ax_mom[j, k].legend()  
         
+        pdfs = stat_dict['PDF_calc'][names[i]]
+        for z, _pdf in enumerate(pdfs):
+            ax_pdf[j, k].plot(_pdf, label=str(z))
+        ax_pdf[j, k].set_xlabel(names[i])  
+        ax_pdf[j, k].set_yscale('log')
+        ax_pdf[j, k].legend()  
 
-        fig_hist.savefig(path +  pl_name + '_hist', dpi=200)
+        pss = stat_dict['PS_calc'][names[i]]
+        for z, _ps in enumerate(pss):
+            ax_ps[j, k].plot(_ps, label=str(z))
+        ax_ps[j, k].set_xlabel(names[i])  
+        ax_ps[j, k].set_yscale('log')
+        ax_ps[j, k].set_xscale('log')
+        ax_ps[j, k].legend()  
         
-
+        psf = stat_dict['PS_fit'][names[i]]
+        for z, _psf in enumerate(psf):
+            ax_ps_fit[j, k].plot(_psf, label=str(z))
+        ax_ps_fit[j, k].set_xlabel(names[i])  
+        ax_ps_fit[j, k].set_yscale('log')
+        ax_ps_fit[j, k].set_xscale('log')
+        ax_ps_fit[j, k].legend()  
         
-    else: 
-        
-        fig_im, ax_im  = pl.subplots(ncols=2, nrows=2) 
-        fig_hist, ax_hist  = pl.subplots(ncols=2, nrows=2) 
-        
-        pl_name = 'all_obs_' + name
-        
-        pos = [(0, 0), (0, 1), (1, 0), (1, 1), ]
-        
-        for i in range(n_plots):
-        
-            j, k = pos[i] 
-            ax_im[j, k].imshow(fields[i], 
-                  cmap=get_cmap(cmaps[i]), 
-                )
-            ax_im[j, k].set_title(names[i])
-            mappable = ax_im[j, k].get_images()[0]
-            fig_im.colorbar(mappable, ax=ax_im[j, k])
+    pl.tight_layout()
             
-            pdf, bins, _ = ax_hist[j, k].hist(fields[i].flatten(), bins=1000, density=True, histtype='step')
-            ax_hist[j, k].set_xlabel(names[i])
-            ax_hist[j, k].set_yscale('log')
-            if save_pdfs:
-                np.save(path + names[i] + '_' + name + '_pdf.npy', pdf)
-                np.save(path + names[i] + '_' + name + '_bins.npy', bins)
-                
-        fig_im.savefig(path + pl_name + '_2d', dpi=200)
-        
-
-        fig_hist.savefig(path +  pl_name + '_hist', dpi=200)
+    fig_im.savefig(path + pl_name + '_2d', dpi=200)
+    fig_mom.savefig(path +  pl_name + '_moments', dpi=200)  
+    fig_hist.savefig(path +  pl_name + '_hist', dpi=200)
+    fig_pdf.savefig(path +  pl_name + '_pdfs', dpi=200)
+    fig_ps.savefig(path +  pl_name + '_power_spectra', dpi=200)
+    fig_ps_fit.savefig(path +  pl_name + '_power_spectra_fitted', dpi=200)
         
     pl.close('all')
     return

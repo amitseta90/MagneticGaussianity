@@ -1,8 +1,8 @@
 #-------- options for plotting ----------------------------
 
 plot_path = "./Plot/"
-plot_name = "gaussian_high_mach_dir_1_all"
-savve_pdfs = True # If pdfs and bins of the matplotlib.hist command shall be saved to disk, for further comparisons
+plot_name = "test"
+save_pdfs = True # If pdfs and bins of the matplotlib.hist command shall be saved to disk, for further comparisons
 
 # -------- what to calculate ------------
 
@@ -20,8 +20,8 @@ lambda_square = 1./512  # squared observing frequency, necessary for faraday rot
 
 #--------- options for the magnetic fields -------------------
 data_path = "./Data/" # path where the magnetic field simulation boxes are stored, the fields are automatically loaded 
-single_file =  None # "sm10_1210.h5" #  name of the file that should be used, if None all files will be used, depending on choices below 
-gaussian = True # if the gaussian fields or non gaussian felds are used
+single_file =  None #"sm10_1210.h5" #  "sm10_1210.h5" #  name of the file that should be used, if None all files will be used, depending on choices below 
+gaussian = False # if the gaussian fields or non gaussian felds are used
 low_mach = False # if the low or high mach cubes should be loaded
 
 #--------- options for the thermal electrons ---------------------

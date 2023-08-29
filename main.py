@@ -2,6 +2,7 @@ import numpy as np
 from observables import calculate_observables
 from data import load_magnetic_field, build_random_electron_density, magnetic_file_names
 from plot import plot_obs
+from analysis import analyze_step
 
 import param as p
 
@@ -15,6 +16,8 @@ def main():
     
     obs = [None, None, None, None]
     calc_obs = [p.do_rm, p.do_i, p.do_qu, p.do_qu]
+    
+    stat_dict = None
     
     for i, fn in enumerate(file_names):
         print("Calculating observables for file {}".format(fn))
@@ -58,11 +61,13 @@ def main():
             for j in range(4):
                 if calc_obs[j]:
                     obs[j] += _obs[j]
-                    
-                    
+            
+            stat_dict = analyze_step(*obs, stat_dict)        
+            
             del Bpar, Bperp, polang # avoid memory leaks
     
-    plot_obs(*obs, p.plot_path, p.plot_name)
+    n_boxes = len(file_names)*len(directions)
+    plot_obs(*obs, stat_dict, n_boxes, p.plot_path, p.plot_name)
         
 if __name__ == "__main__":
     main()
