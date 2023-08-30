@@ -3,10 +3,17 @@ import nifty8 as ift
 from copy import copy
 
 
-def analyze_step(rm, i, q, u, stat_dict=None, n_moments=4):
+def analyze_step(rm, i, q, u, stat_dict=None, n_moments=4, do_pi=False):
     fields = [rm, i, q, u]
     do_field = [not f is None for f in fields]
-    names = ['RM', 'I', 'Q', 'U']
+    
+    if do_field[2] + do_field[3] == 2: 
+        if do_pi:
+            fields = [rm, i, q, np.sqrt(q**2 + u**2)] 
+    else:
+        do_pi = False
+        
+    names = ['RM', 'I', 'Q', 'PI'] if do_pi else ['RM', 'I', 'Q', 'U']
     
     map(fields.__delitem__, sorted(do_field, reverse=True))
     map(names.__delitem__, sorted(do_field, reverse=True))

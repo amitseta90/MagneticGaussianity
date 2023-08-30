@@ -62,12 +62,12 @@ def main():
                 if calc_obs[j]:
                     obs[j] += _obs[j]
             
-            stat_dict = analyze_step(*obs, stat_dict)        
+            stat_dict = analyze_step(*obs, stat_dict, do_pi=p.do_pi)        
             
             del Bpar, Bperp, polang # avoid memory leaks
     
     n_boxes = len(file_names)*len(directions)
-    plot_obs(*obs, stat_dict, n_boxes, p.plot_path, p.plot_name)
+    plot_obs(*obs, stat_dict, n_boxes, p.plot_path, p.plot_name, p.save_pdfs, p.do_pi)
         
 if __name__ == "__main__":
     main()
