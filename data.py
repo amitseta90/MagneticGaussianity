@@ -37,7 +37,7 @@ def load_magnetic_field(path, gaussian, direction, return_polang):
         
         polang = None
         if return_polang:
-            polang =np.arctan2(f[b_perp_y_key][: ,: ,:],  f[b_perp_x_key][: ,: ,:]) + np.pi/2 # type: ignore
+            polang = np.arctan2(f[b_perp_y_key][: ,: ,:],  f[b_perp_x_key][: ,: ,:]) + np.pi/2 # type: ignore
              
     return (bpar, b_perp, polang)
 

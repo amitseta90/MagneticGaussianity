@@ -1,7 +1,7 @@
 #-------- options for plotting ----------------------------
 
 plot_path = "./Plot/"
-plot_name = "all_obs_nongauss"
+plot_name = "all_obs_nongauss_dir_all"
 save_pdfs = True # If pdfs and bins of the matplotlib.hist command shall be saved to disk, for further comparisons
 do_pi = True # If the polarized intensity shall be plotted instead of U
 
@@ -11,7 +11,7 @@ do_rm = True # if the rotation measure should be calculated
 do_i = True  # if Stokes I should be calculated
 do_qu = True  # if Stokes Q and U should be calculated
 faraday_rotate = False # if Qs and Us should be Faraday rotated along the way, computationally expensive compared to simple integration!
-direction = 1  # direction the cubes are integrated and stacked along (possible are None, 0, 1, 2). If None, the cubes are also stacked over all directions
+direction = None  # direction the cubes are integrated and stacked along (possible are None, 0, 1, 2). If None, the cubes are also stacked over all directions
 rotate_cubes = False
 
 #--------- some physics -----------------

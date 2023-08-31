@@ -108,8 +108,9 @@ def plot_obs(rm, i, q, u, stat_dict, n_boxes, path='./Plot/', name='', save_pdfs
         ax_mom[j, k].legend()  
         
         pdfs = stat_dict['PDF_calc'][names[i]]
+        x = stat_dict['PDF_bin_center'][names[i]]
         for z, _pdf in enumerate(pdfs):
-            ax_pdf[j, k].plot(_pdf, label=str(z))
+            ax_pdf[j, k].plot(x[z], _pdf, label=str(z))
         #ax_pdf[j, k].set_xlabel(names[i])  
         ax_pdf[j, k].set_yscale('log')
         #ax_pdf[j, k].legend()  

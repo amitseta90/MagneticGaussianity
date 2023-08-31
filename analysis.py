@@ -24,6 +24,7 @@ def analyze_step(rm, i, q, u, stat_dict=None, n_moments=4, do_pi=False):
         stat_dict = {'PS_calc': {n: list() for n in names}, 
                      'PS_fit': {n: list() for n in names}, 
                      'PDF_calc': {n: list() for n in names}, 
+                     'PDF_bin_center': {n: list() for n in names}, 
                      'Moments': m_dict, 
                     }
 
@@ -41,7 +42,7 @@ def analyze_step(rm, i, q, u, stat_dict=None, n_moments=4, do_pi=False):
   
         psf = ps_fit(ps_param)()
         
-        pdf, bins,= np.histogram(f, bins=1000, density=True)
+        pdf, bins,= np.histogram(f.flatten(), bins=1000, density=True)
         
         d = np.diff(bins) 
         x = d/2 + bins[:-1]
@@ -56,6 +57,7 @@ def analyze_step(rm, i, q, u, stat_dict=None, n_moments=4, do_pi=False):
         stat_dict['PS_calc'][name].append(ps.val)
         stat_dict['PS_fit'][name].append(psf)
         stat_dict['PDF_calc'][name].append(pdf)
+        stat_dict['PDF_bin_center'][name].append(x)
         # stat_dict['Moments'][name].append(mom)
         # print(stat_dict['Moments'][name])
     return stat_dict
