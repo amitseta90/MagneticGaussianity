@@ -4,13 +4,27 @@ import h5py as h5
 import glob
 
 
-def magnetic_file_names(low_mach, path='./Data/'):
+def simulation_file_names(low_mach, path='./Data/'):
     if low_mach: 
         files = glob.glob(path + "sm0p1*.h5")
     else:
         files = glob.glob(path + "sm10*.h5")
     return files
     
+def bpol_from_perp(bperp_1, bperp_2, return_polang):
+    b_perp = np.sqrt(bperp_1**2 + bperp_2**2)
+    polang = None
+
+    if return_polang:#
+        polang = np.arctan2(bperp_2,  bperp_1) + np.pi/2
+    
+    return (b_perp, polang)
+
+    
+def load_electron_density(path):
+    with h5.File(path, "r") as f:
+        nth = f['ne' ][: ,: ,:] # type: ignore
+    return nth
 
 
 def load_magnetic_field(path, gaussian, direction, return_polang):
@@ -33,12 +47,8 @@ def load_magnetic_field(path, gaussian, direction, return_polang):
             
         bpar = f[b_par_key][: ,: ,:] # type: ignore
         
-        b_perp = np.sqrt(f[b_perp_x_key][: ,: ,:]**2 + f[b_perp_y_key][: ,: ,:]**2) # type: ignore
+        b_perp, polang = bpol_from_perp(f[b_perp_x_key][: ,: ,:], f[b_perp_y_key][: ,: ,:], return_polang)
         
-        polang = None
-        if return_polang:
-            polang = np.arctan2(f[b_perp_y_key][: ,: ,:],  f[b_perp_x_key][: ,: ,:]) + np.pi/2 # type: ignore
-             
     return (bpar, b_perp, polang)
 
 
