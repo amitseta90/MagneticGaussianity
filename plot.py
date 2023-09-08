@@ -41,6 +41,25 @@ def gen_axis(n_plots, names, n_figs):
     return figs, axs, coordinates, pl_name
     
 
+def save_obs(rm, i, q, u, path='./Results/', name='', do_pi=True):
+    if len(name) > 0: 
+        path  = path + name + '/'
+        if not os.path.exists(path):
+            os.makedirs(path)
+    
+    
+    fields = [rm, i, q, u] 
+    do_field = [not f is None for f in fields]
+    names = ['RM', 'I', 'Q', 'PI'] if do_pi else ['RM', 'I', 'Q', 'U']
+
+    n_plots = sum(do_field)
+    
+    map(fields.__delitem__, sorted(do_field, reverse=True))
+    map(names.__delitem__, sorted(do_field, reverse=True))
+    
+    for i in range(n_plots):
+        np.save(path + names[i], fields[i])
+
 
 def plot_obs(rm, i, q, u, stat_dict, n_boxes, path='./Plot/', name='', save_pdfs=True, do_pi=True):
     

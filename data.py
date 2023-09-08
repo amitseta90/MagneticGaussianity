@@ -15,8 +15,8 @@ def bpol_from_perp(bperp_1, bperp_2, return_polang):
     b_perp = np.sqrt(bperp_1**2 + bperp_2**2)
     polang = None
 
-    if return_polang:#
-        polang = np.arctan2(bperp_2,  bperp_1) + np.pi/2
+    if return_polang:
+        polang = 0.5*np.arctan2(bperp_2,  bperp_1) + np.pi/2 # + pi/2, since sync radiation is perpendicular to magnetic field direction
     
     return (b_perp, polang)
 

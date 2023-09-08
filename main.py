@@ -1,7 +1,7 @@
 import numpy as np
 from observables import calculate_observables
 from data import load_magnetic_field, build_random_electron_density, simulation_file_names, load_electron_density, bpol_from_perp
-from plot import plot_obs
+from plot import plot_obs, save_obs
 from analysis import analyze_step
 
 import param as p
@@ -45,13 +45,15 @@ def main():
                 n_th = load_electron_density(fn) 
                 shape = n_th.shape
             else:
-                n_th = p.th_n0
+                n_th = 1.
+            n_th *= p.th_n0
             
         if p.do_i or p.do_qu:
             if p.cr_type == "random":
                 n_cr = build_random_electron_density(shape, **p.cr_random_params) # type: ignore
             else:
-                n_cr = p.cr_n0
+                n_cr = 1. 
+            n_cr *= p.th_n0
         
         if p.direction is None: 
             directions = [0, 1, 2]
@@ -69,6 +71,8 @@ def main():
                 dir_1 = (direction + 1) % 3     
                 dir_2 = (direction + 2) % 3     
                 Bperp, polang = bpol_from_perp(b[dir_1], b[dir_2], p.do_qu + p.faraday_rotate)
+            Bpar *= p.b_0
+            Bperp *= p.b_0
                 
             
             shp = list(shape)
@@ -91,7 +95,8 @@ def main():
             del Bpar, Bperp, polang # avoid memory leaks
     
     n_boxes = len(file_names)*len(directions)
-    plot_obs(*obs, stat_dict, n_boxes, p.plot_path, p.plot_name, p.save_pdfs, p.do_pi)
+    plot_obs(*obs, stat_dict, n_boxes, p.plot_path, p.name, p.save_pdfs, p.do_pi)
+    save_obs(*obs, p.result_path, p.name, p.do_pi)
         
 if __name__ == "__main__":
     main()

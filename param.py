@@ -1,7 +1,8 @@
 #-------- options for plotting ----------------------------
 
-plot_path = "./Plot/"
-plot_name = "test_all"
+plot_path = "./Plot/"  # plots are saved in a directory here
+result_path = "./Results/" # results are saved in a directory here
+name = "all_boxes_sim_nth_sim_b_gaussian_dir0"
 save_pdfs = True # If pdfs and bins of the matplotlib.hist command shall be saved to disk, for further comparisons
 do_pi = True # If the polarized intensity shall be plotted instead of U
 
@@ -11,7 +12,7 @@ do_rm = True # if the rotation measure should be calculated
 do_i = True  # if Stokes I should be calculated
 do_qu = True  # if Stokes Q and U should be calculated
 faraday_rotate = False # if Qs and Us should be Faraday rotated along the way, computationally expensive compared to simple integration!
-direction = None  # direction the cubes are integrated and stacked along (possible are None, 0, 1, 2). If None, the cubes are also stacked over all directions
+direction = 0  # direction the cubes are integrated and stacked along (possible are None, 0, 1, 2). If None, the cubes are also stacked over all directions
 rotate_cubes = False
 
 shape = (512, 512) # shape parameter, unused if any simulated data is used
@@ -30,17 +31,19 @@ low_mach = False # if the low or high mach cubes should be loaded
 mag_type = "simulation" #possible are "simulation" or "constant"
 
 # simulated params
-gaussian = False # if the gaussian or non gaussian fields are used
+gaussian = True # if the gaussian or non gaussian fields are used
 # constant params
 bx = 1.   
 by = 1.   
 bz = 1.    
 
+b_0 = 1.e-3 # normalization
+
 #--------- options for the thermal electrons ---------------------
 
 th_type = "simulation" #possible are "random", "simulation" or "constant"
  
-# constant params
+# constant params, also used for normalization
 th_n0 = 1.    
 
 # random params
@@ -57,8 +60,8 @@ th_random_params = {
 #--------- options for the comsic ray electrons ---------------------
 cr_type = "constant" #possible are "random" or "constant"
 
-# constant params
-cr_n0 = 1.    
+# constant params, also used for normalization
+cr_n0 = 10.    
 
 # random params
 cr_random_params = {
